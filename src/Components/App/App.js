@@ -4,7 +4,8 @@ import { Playlist } from "../Playlist/Playlist";
 import Spotify from "../../util/Spotify";
 import React from "react";
 import "./App.css";
-//Check key are duplicated error and and if return statement is required at the end of Spotify.savePlaylist function
+/*Check key are duplicated error and and if return statement is required at the end of Spotify.savePlaylist function
+Filter out duplicate songs in recently played songs*/
 
 class App extends React.Component {
   constructor(props) {
@@ -83,13 +84,13 @@ class App extends React.Component {
   search(term) {
     Spotify.search(term).then((searchResults) => {
       this.setState({ searchResults: searchResults });
-      // console.log(searchResults);
     });
   }
 
   async getRecentlyPlayed() {
-    const results = await Spotify.getRecentlyPlayed();
-    this.setState({ recentlyPlayed: results });
+    let results = await Spotify.getRecentlyPlayed();
+    const unique = [...new Map(results.map((m) => [m.id, m])).values()];
+    this.setState({ recentlyPlayed: unique });
   }
 }
 
