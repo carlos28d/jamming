@@ -4,11 +4,13 @@ import { Playlist } from "../Playlist/Playlist";
 import Spotify from "../../util/Spotify";
 import React from "react";
 import "./App.css";
+//Check key are duplicated error and and if return statement is required at the end of Spotify.savePlaylist function
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      recentlyPlayed: [],
       searchResults: [],
       playlistName: "",
       playlistTracks: [],
@@ -18,6 +20,7 @@ class App extends React.Component {
     this.updatePlaylistName = this.updatePlaylistName.bind(this);
     this.savePlaylist = this.savePlaylist.bind(this);
     this.search = this.search.bind(this);
+    this.getRecentlyPlayed = this.getRecentlyPlayed.bind(this);
   }
 
   render() {
@@ -27,11 +30,20 @@ class App extends React.Component {
           Ja<span className="highlight">mmm</span>ing
         </h1>
         <div className="App">
-          <SearchBar onSearch={this.search} />
+          <SearchBar
+            onSearch={this.search}
+            addRecentlyPlayed={this.getRecentlyPlayed}
+          />
           <div className="App-playlist">
             <SearchResults
               onAdd={this.addTrack}
               searchResults={this.state.searchResults}
+              isRecent={false}
+            />
+            <SearchResults
+              onAdd={this.addTrack}
+              searchResults={this.state.recentlyPlayed}
+              isRecent={true}
             />
             <Playlist
               playlistName={this.state.playlistName}
@@ -71,7 +83,13 @@ class App extends React.Component {
   search(term) {
     Spotify.search(term).then((searchResults) => {
       this.setState({ searchResults: searchResults });
+      // console.log(searchResults);
     });
+  }
+
+  async getRecentlyPlayed() {
+    const results = await Spotify.getRecentlyPlayed();
+    this.setState({ recentlyPlayed: results });
   }
 }
 

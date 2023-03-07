@@ -17,7 +17,10 @@ const Spotify = {
       window.history.pushState("Acess Token", null, "/");
       return accessToken;
     } else {
-      const accessUrl = `https://accounts.spotify.com/authorize?client_id=${clientID}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectUri}`;
+      const scope = encodeURIComponent(
+        "playlist-modify-public user-read-recently-played"
+      );
+      const accessUrl = `https://accounts.spotify.com/authorize?client_id=${clientID}&response_type=token&scope=${scope}&redirect_uri=${redirectUri}`;
       window.location.href = accessUrl;
     }
   },
@@ -35,13 +38,14 @@ const Spotify = {
         if (!jsonResponse.tracks) {
           return [];
         }
-        return jsonResponse.tracks.items.map((track) => ({
+        const tracks = jsonResponse.tracks.items.map((track) => ({
           id: track.id,
           name: track.name,
           artist: track.artists[0].name,
           album: track.album.name,
           uri: track.uri,
         }));
+        return tracks;
       });
   },
   async savePlaylist(name, trackUris) {
@@ -65,6 +69,7 @@ const Spotify = {
     );
     const playlistJsonResponse = await playlistReponse.json();
     const playlistId = await playlistJsonResponse.id;
+    //Is the return keyword needed?
     return fetch(
       `https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`,
       {
@@ -73,6 +78,25 @@ const Spotify = {
         body: JSON.stringify({ uris: trackUris }),
       }
     );
+  },
+  async getRecentlyPlayed() {
+    const accessToken = await Spotify.getAcessToken();
+    const playedResponse = await fetch(
+      "https://api.spotify.com/v1/me/player/recently-played",
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    const playedJsonResponse = await playedResponse.json();
+    const items = playedJsonResponse.items;
+    const tracks = items.map((item) => ({
+      id: item.track.id,
+      name: item.track.name,
+      artist: item.track.artists[0].name,
+      album: item.track.album.name,
+      uri: item.track.uri,
+    }));
+    return tracks;
   },
 };
 

@@ -7,8 +7,12 @@ export class SearchResults extends React.Component {
     this.isRemoval = false;
     return (
       <div className="SearchResults">
-        <h2>Results</h2>
-        <TrackList isRemoval={this.isRemoval} onAdd={this.props.onAdd} searchResults={this.props.searchResults} />
+        <h2>{!this.props.isRecent ? 'Search Results' : 'Recently listened to'}</h2>
+        <TrackList
+          isRemoval={this.isRemoval}
+          onAdd={this.props.onAdd}
+          searchResults={this.props.searchResults}
+        />
       </div>
     );
   }

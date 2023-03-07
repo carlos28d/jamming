@@ -15,6 +15,7 @@ export class TrackList extends React.Component {
                 />
       )
     });
+    
     return (
       <div className="TrackList">
         {this.tracks}
