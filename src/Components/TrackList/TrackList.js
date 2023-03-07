@@ -8,7 +8,7 @@ export class TrackList extends React.Component {
       return (
                 <Track 
                   track={track} 
-                  key={track.id}
+                  key={track.id + '_' + track.album}
                   isRemoval={this.props.isRemoval}
                   onRemove={this.props.onRemove}
                   onAdd={this.props.onAdd} 
