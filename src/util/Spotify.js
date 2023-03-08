@@ -1,5 +1,5 @@
 const clientID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-const redirectUri = "https://heartfelt-taiyaki-6082f9.netlify.app/";
+const redirectUri = "http://localhost:3000/";
 let accessToken;
 const Spotify = {
   getAcessToken() {
@@ -24,29 +24,28 @@ const Spotify = {
       window.location.href = accessUrl;
     }
   },
-  search(term) {
-    const accessToken = Spotify.getAcessToken();
-    return fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((jsonResponse) => {
-        if (!jsonResponse.tracks) {
-          return [];
-        }
-        const tracks = jsonResponse.tracks.items.map((track) => ({
-          id: track.id,
-          name: track.name,
-          artist: track.artists[0].name,
-          album: track.album.name,
-          uri: track.uri,
-        }));
-        return tracks;
-      });
+  async search(term) {
+    const accessToken = await Spotify.getAcessToken();
+    const trackResponse = await fetch(
+      `https://api.spotify.com/v1/search?type=track&q=${term}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const trackJsonResponse = await trackResponse.json();
+    if (!trackJsonResponse.tracks) {
+      return [];
+    }
+    const tracks = trackJsonResponse.tracks.items.map((track) => ({
+      id: track.id,
+      name: track.name,
+      artist: track.artists[0].name,
+      album: track.album.name,
+      uri: track.uri,
+    }));
+    return tracks;
   },
   async savePlaylist(name, trackUris) {
     if (!name && !trackUris.length) {
